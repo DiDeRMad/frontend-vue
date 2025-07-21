@@ -20,13 +20,16 @@
 
     let myId = null;
     let players = {};
+    let worldWidth = 800;
+    let worldHeight = 600;
+    let playerSize = 20;
 
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       for (const id in players) {
         const p = players[id];
-        ctx.fillStyle = id === myId ? 'orange' : 'cyan';
-        ctx.fillRect(p.x, p.y, 20, 20);
+        ctx.fillStyle = p.color || (id === myId ? 'orange' : 'cyan');
+        ctx.fillRect(p.x, p.y, playerSize, playerSize);
       }
       requestAnimationFrame(draw);
     }
@@ -34,15 +37,22 @@
     socket.on('init', (data) => {
       myId = data.id;
       players = data.players;
+      if (data.world) {
+        worldWidth = data.world.width;
+        worldHeight = data.world.height;
+        playerSize = data.world.playerSize;
+        canvas.width = worldWidth;
+        canvas.height = worldHeight;
+      }
       draw();
     });
 
     socket.on('playerJoined', (data) => {
-      players[data.id] = data.position;
+      players[data.id] = data.player;
     });
 
     socket.on('playerMoved', (data) => {
-      players[data.id] = data.position;
+      players[data.id] = data.player;
     });
 
     socket.on('playerLeft', (data) => {
@@ -59,6 +69,9 @@
         case 'ArrowLeft': p.x -= speed; break;
         case 'ArrowRight': p.x += speed; break;
       }
+      // Clamp locally before sending
+      p.x = Math.max(0, Math.min(worldWidth - playerSize, p.x));
+      p.y = Math.max(0, Math.min(worldHeight - playerSize, p.y));
       socket.emit('move', { x: p.x, y: p.y });
     });
   </script>
