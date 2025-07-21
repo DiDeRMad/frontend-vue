@@ -6,6 +6,7 @@ interface Player extends Vec2 {
   health: number;
   score: number;
   lastDir: Vec2; // direction of last movement for shooting
+  name: string;
 }
 
 interface Projectile extends Vec2 {
@@ -30,7 +31,13 @@ export class Game {
       health: 100,
       score: 0,
       lastDir: { x: 1, y: 0 },
+      name: 'Anonymous',
     });
+  }
+
+  setPlayerName(id: string, name: string) {
+    const player = this.players.get(id);
+    if (player) player.name = name.slice(0, 16); // limit length
   }
 
   movePlayer(id: string, dx: number, dy: number) {

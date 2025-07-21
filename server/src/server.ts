@@ -26,6 +26,16 @@ io.on('connection', (socket) => {
     game.movePlayer(socket.id, direction.dx, direction.dy);
   });
 
+  socket.on('setName', (name: string) => {
+    game.setPlayerName(socket.id, name);
+  });
+
+  socket.on('chat', (message: string) => {
+    const player = game.getState().players[socket.id];
+    const name = player?.name || 'Anonymous';
+    io.emit('chat', { id: socket.id, name, message: message.slice(0, 200) });
+  });
+
   socket.on('shoot', (dir: Vec2 | undefined) => {
     if (dir) {
       game.shoot(socket.id, dir);
