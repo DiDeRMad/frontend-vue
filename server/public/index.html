@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Super Online Game MVP</title>
+  <style>
+    body { margin: 0; overflow: hidden; }
+    canvas { background: #222; display: block; margin: 0 auto; }
+  </style>
+</head>
+<body>
+  <canvas id="game" width="800" height="600"></canvas>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+
+    const canvas = document.getElementById('game');
+    const ctx = canvas.getContext('2d');
+
+    const state = {};
+
+    socket.on('init', ({ id, state: serverState }) => {
+      Object.assign(state, serverState);
+      socket.id = id;
+      draw();
+    });
+
+    socket.on('state', (serverState) => {
+      Object.assign(state, serverState);
+      draw();
+    });
+
+    socket.on('playerJoined', ({ id }) => {
+      state[id] = { x: 0, y: 0 };
+      draw();
+    });
+
+    socket.on('playerLeft', ({ id }) => {
+      delete state[id];
+      draw();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      const speed = 5;
+      let dx = 0, dy = 0;
+      if (e.key === 'ArrowUp') dy = -speed;
+      if (e.key === 'ArrowDown') dy = speed;
+      if (e.key === 'ArrowLeft') dx = -speed;
+      if (e.key === 'ArrowRight') dx = speed;
+
+      if (dx || dy) socket.emit('move', { dx, dy });
+    });
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      Object.values(state).forEach(({ x, y }) => {
+        ctx.fillStyle = 'white';
+        ctx.beginPath();
+        ctx.arc(400 + x, 300 + y, 10, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    }
+  </script>
+</body>
+</html>

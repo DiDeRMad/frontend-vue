@@ -1,61 +1,36 @@
-# form-generator-app
+# Super Online Game – MVP
 
-Профессиональный генератор форм на Vue 3 + TypeScript
+This is a minimal multiplayer prototype (client + server) to kick-start the development of a bigger online game.  
+Run multiple browser tabs (or different machines) to see the players synchronised in real time.
 
-## Быстрый старт
+## Prerequisites
+* Node.js ≥ 18
+* npm
 
-sh
+## Setup & start (development)
+
+```bash
+cd server
 npm install
 npm run dev
+```
 
+Open `http://localhost:3000` in several tabs and use the arrow keys to move your circle around.  
+The state is broadcast to every connected client.
 
-## Структура проекта
+## Production build
 
+```bash
+cd server
+npm run build        # compile TypeScript
+npm run start        # run compiled JS from dist/
+```
 
-form-generator-app/
-├── public/                # Статические файлы (index.html, favicon, animejs CDN)
-├── src/
-│   ├── assets/            # SCSS-стили, картинки
-│   ├── components/        # FormGenerator, ContactTitle, другие компоненты
-│   ├── views/             # Демо-страницы: ContactDemo, WizardDemo, DynamicDemo
-│   ├── store/             # Vuex store
-│   ├── router/            # Vue Router
-│   ├── App.vue            # Корневой компонент
-│   └── main.js            # Точка входа
-├── package.json           # Зависимости и скрипты
-├── README.md              # Документация
-└── ...
+---
 
+From here you can:
 
-## Как запускать
-1. Перейдите в папку проекта:
-   sh
-   cd form-generator-app
-   
-2. Установите зависимости:
-   sh
-   npm install
-   
-3. Запустите dev-сервер:
-   sh
-   npm run dev
-   
-4. Откройте браузер по адресу, который появится в терминале (обычно http://localhost:5173)
-
-## Архитектура
-- **FormGenerator** — универсальный компонент генерации форм с поддержкой слотов, строгой типизацией и валидацией
-- **Vuex** — для хранения состояния форм
-- **Vue Router** — для навигации между демо-страницами
-- **SCSS + BEM** — для стилей
-- **Демо-страницы**:
-  - Contact Demo — простая контактная форма
-  - Wizard Demo — многошаговая форма
-  - Dynamic Demo — форма с динамическими полями
-
-## Скриншоты
-https://postimg.cc/RJqpVQVD
-https://postimg.cc/YjyyDVdK
-https://postimg.cc/LhsbTRB3
-
-
-Автор: Бушин Дмитрий
+* Extend the `Game` class with health, score, projectiles, etc.
+* Replace the simple canvas render with a proper engine like Phaser or PixiJS.
+* Move the client into a separate build step (e.g. Vite + TypeScript/React).
+* Persist game state in a database for long-living worlds.
