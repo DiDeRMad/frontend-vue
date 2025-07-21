@@ -1,22 +1,32 @@
 {
-  "name": "form-generator-app",
-  "version": "0.0.0",
+  "name": "mmorpg-game",
+  "version": "1.0.0",
+  "description": "Massive Multiplayer Online Role-Playing Game",
   "private": true,
-  "type": "module",
+  "workspaces": [
+    "client",
+    "server",
+    "shared"
+  ],
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "vue": "^3.5.17",
-    "vue-router": "^4.5.1"
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "build": "npm run build:shared && npm run build:server && npm run build:client",
+    "build:shared": "cd shared && npm run build",
+    "build:server": "cd server && npm run build",
+    "build:client": "cd client && npm run build",
+    "start": "cd server && npm start",
+    "test": "npm run test:shared && npm run test:server && npm run test:client",
+    "migrate": "cd server && npm run migrate",
+    "seed": "cd server && npm run seed"
   },
   "devDependencies": {
-    "@types/node": "^24.0.15",
-    "@vitejs/plugin-vue": "^6.0.0",
-    "typescript": "^5.8.3",
-    "vite": "^7.0.0",
-    "vite-plugin-vue-devtools": "^7.7.7"
+    "concurrently": "^8.2.2",
+    "@types/node": "^20.11.0",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
