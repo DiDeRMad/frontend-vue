@@ -2,6 +2,7 @@ import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
 import { initGameLoop } from './game/gameLoop';
+import { addPlayer, removePlayer, movePlayer } from './game/gameState';
 
 const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 
@@ -16,7 +17,17 @@ const io = new Server(server, {
 io.on('connection', (socket) => {
   console.log(`Client connected: ${socket.id}`);
 
+  // Register new player and send its initial state back
+  const player = addPlayer(socket.id);
+  socket.emit('init', player);
+
+  // Update player position upon client command
+  socket.on('move', (delta: { dx: number; dy: number }) => {
+    movePlayer(socket.id, delta.dx, delta.dy);
+  });
+
   socket.on('disconnect', () => {
+    removePlayer(socket.id);
     console.log(`Client disconnected: ${socket.id}`);
   });
 
