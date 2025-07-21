@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Super Puper Online Game</title>
+  <style>
+    body { margin: 0; overflow: hidden; background: #111; color: #fff; }
+    canvas { background: #333; display: block; margin: 0 auto; }
+  </style>
+</head>
+<body>
+  <canvas id="gameCanvas" width="800" height="600"></canvas>
+
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script>
+    const socket = io();
+
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let myId = null;
+    let players = {};
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (const id in players) {
+        const p = players[id];
+        ctx.fillStyle = id === myId ? 'orange' : 'cyan';
+        ctx.fillRect(p.x, p.y, 20, 20);
+      }
+      requestAnimationFrame(draw);
+    }
+
+    socket.on('init', (data) => {
+      myId = data.id;
+      players = data.players;
+      draw();
+    });
+
+    socket.on('playerJoined', (data) => {
+      players[data.id] = data.position;
+    });
+
+    socket.on('playerMoved', (data) => {
+      players[data.id] = data.position;
+    });
+
+    socket.on('playerLeft', (data) => {
+      delete players[data.id];
+    });
+
+    document.addEventListener('keydown', (e) => {
+      const p = players[myId];
+      if (!p) return;
+      const speed = 5;
+      switch (e.key) {
+        case 'ArrowUp': p.y -= speed; break;
+        case 'ArrowDown': p.y += speed; break;
+        case 'ArrowLeft': p.x -= speed; break;
+        case 'ArrowRight': p.x += speed; break;
+      }
+      socket.emit('move', { x: p.x, y: p.y });
+    });
+  </script>
+</body>
+</html>

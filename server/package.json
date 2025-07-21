@@ -1,0 +1,13 @@
+{
+  "name": "super-online-game",
+  "version": "0.0.1",
+  "description": "Super puper online game skeleton",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.7.2"
+  }
+}
