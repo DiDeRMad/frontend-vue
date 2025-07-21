@@ -6,10 +6,18 @@
   <style>
     body { margin: 0; overflow: hidden; background: #111; color: #fff; }
     canvas { background: #333; display: block; margin: 0 auto; }
+    #chatContainer { position: absolute; bottom: 0; left: 0; width: 300px; height: 40%; display: flex; flex-direction: column; font-family: Arial, sans-serif; }
+    #chatLog { flex: 1; overflow-y: auto; background: rgba(0,0,0,0.6); padding: 4px; font-size: 12px; }
+    #chatInput { border: none; padding: 6px; font-size: 14px; outline: none; width: 100%; box-sizing: border-box; }
   </style>
 </head>
 <body>
   <canvas id="gameCanvas" width="800" height="600"></canvas>
+
+  <div id="chatContainer">
+    <div id="chatLog"></div>
+    <input id="chatInput" placeholder="Type message & press Enter" autocomplete="off" />
+  </div>
 
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <script>
@@ -22,6 +30,8 @@
     }
 
     const canvas = document.getElementById('gameCanvas');
+    const chatLog = document.getElementById('chatLog');
+    const chatInput = document.getElementById('chatInput');
     const ctx = canvas.getContext('2d');
 
     let myId = null;
@@ -76,6 +86,28 @@
     socket.on('nicknameChanged', (data) => {
       if (players[data.id]) {
         players[data.id].nick = data.nick;
+      }
+    });
+
+    // Chat: receive messages
+    socket.on('chat', (payload) => {
+      const div = document.createElement('div');
+      const time = new Date(payload.time);
+      const hh = String(time.getHours()).padStart(2, '0');
+      const mm = String(time.getMinutes()).padStart(2, '0');
+      div.textContent = `[${hh}:${mm}] ${payload.nick}: ${payload.message}`;
+      chatLog.appendChild(div);
+      chatLog.scrollTop = chatLog.scrollHeight;
+    });
+
+    // Chat: send on Enter
+    chatInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const text = chatInput.value.trim();
+        if (text.length) {
+          socket.emit('chat', text);
+          chatInput.value = '';
+        }
       }
     });
 

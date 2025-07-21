@@ -71,6 +71,19 @@ io.on('connection', (socket) => {
     }
   });
 
+  // Handle chat messages
+  socket.on('chat', (msg) => {
+    if (typeof msg === 'string' && msg.trim().length > 0 && msg.trim().length <= 200) {
+      const payload = {
+        id: socket.id,
+        nick: players[socket.id]?.nick || 'Unknown',
+        message: msg.trim(),
+        time: Date.now()
+      };
+      io.emit('chat', payload);
+    }
+  });
+
   // Clean up when the client disconnects
   socket.on('disconnect', () => {
     console.log(`Player disconnected: ${socket.id}`);
