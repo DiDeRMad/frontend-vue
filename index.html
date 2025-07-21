@@ -1,13 +1,194 @@
 <!DOCTYPE html>
-<html lang="">
-  <head>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
-    <link rel="icon" href="/favicon.ico">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vite App</title>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.js"></script>
-  </body>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    
+    <!-- SEO Meta Tags -->
+    <title>Eternal Realms Online - Epic MMORPG Adventure</title>
+    <meta name="description" content="Join millions of players in Eternal Realms Online, the ultimate MMORPG experience. Explore vast worlds, engage in epic battles, and forge your legend!">
+    <meta name="keywords" content="MMORPG, online game, RPG, multiplayer, fantasy, adventure">
+    <meta name="author" content="Eternal Realms Studios">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://eternalrealmsonline.com/">
+    <meta property="og:title" content="Eternal Realms Online - Epic MMORPG Adventure">
+    <meta property="og:description" content="Join millions of players in the ultimate MMORPG experience. Create your hero and forge your legend!">
+    <meta property="og:image" content="/assets/social/og-image.jpg">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://eternalrealmsonline.com/">
+    <meta property="twitter:title" content="Eternal Realms Online">
+    <meta property="twitter:description" content="Join the epic MMORPG adventure!">
+    <meta property="twitter:image" content="/assets/social/twitter-image.jpg">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/manifest.json">
+    
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="msapplication-TileColor" content="#1a1a2e">
+    
+    <!-- Preconnect to external resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Critical CSS -->
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #0a0a0f;
+            color: #ffffff;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        #root {
+            height: 100%;
+            position: relative;
+        }
+        
+        /* Initial loading screen */
+        .initial-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        
+        .loader-logo {
+            width: 200px;
+            height: 200px;
+            margin-bottom: 40px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        .loader-spinner {
+            width: 60px;
+            height: 60px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #4a90e2;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        .loader-text {
+            margin-top: 20px;
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.8);
+            font-family: 'Cinzel', serif;
+            letter-spacing: 2px;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Hide scrollbar but keep functionality */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        /* Disable text selection in game */
+        .no-select {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Initial loading screen (shown before React loads) -->
+    <div id="initial-loader" class="initial-loader">
+        <img src="/assets/ui/logo.png" alt="Eternal Realms Online" class="loader-logo" onerror="this.style.display='none'">
+        <div class="loader-spinner"></div>
+        <div class="loader-text">LOADING REALM</div>
+    </div>
+    
+    <!-- React root -->
+    <div id="root"></div>
+    
+    <!-- Canvas for WebGL/Three.js (will be managed by React) -->
+    <canvas id="game-canvas" style="display: none;"></canvas>
+    
+    <!-- Noscript fallback -->
+    <noscript>
+        <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0a0a0f; color: #fff; display: flex; align-items: center; justify-content: center; text-align: center; padding: 20px;">
+            <div>
+                <h1 style="font-family: 'Cinzel', serif; font-size: 32px; margin-bottom: 20px;">JavaScript Required</h1>
+                <p style="font-size: 18px; line-height: 1.6; max-width: 600px;">
+                    Eternal Realms Online requires JavaScript to be enabled in your browser. 
+                    Please enable JavaScript and refresh the page to continue your adventure.
+                </p>
+            </div>
+        </div>
+    </noscript>
+    
+    <!-- Remove initial loader once React takes over -->
+    <script>
+        window.addEventListener('load', function() {
+            // Give React time to initialize
+            setTimeout(function() {
+                const loader = document.getElementById('initial-loader');
+                if (loader) {
+                    loader.style.transition = 'opacity 0.5s ease-out';
+                    loader.style.opacity = '0';
+                    setTimeout(function() {
+                        loader.remove();
+                    }, 500);
+                }
+            }, 100);
+        });
+    </script>
+</body>
 </html>
