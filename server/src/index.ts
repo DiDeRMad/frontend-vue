@@ -2,7 +2,7 @@ import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
 import { initGameLoop } from './game/gameLoop';
-import { addPlayer, removePlayer, movePlayer } from './game/gameState';
+import { addPlayer, removePlayer, movePlayer, updatePlayerName } from './game/gameState';
 
 const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 
@@ -20,6 +20,10 @@ io.on('connection', (socket) => {
   // Register new player and send its initial state back
   const player = addPlayer(socket.id);
   socket.emit('init', player);
+
+  socket.on('setName', (name: string) => {
+    updatePlayerName(socket.id, name);
+  });
 
   // Update player position upon client command
   socket.on('move', (delta: { dx: number; dy: number }) => {
