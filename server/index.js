@@ -12,6 +12,10 @@ function randomColor() {
   return '#' + Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, '0');
 }
 
+function generateGuestName() {
+  return 'Guest' + Math.floor(1000 + Math.random() * 9000);
+}
+
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -30,7 +34,8 @@ io.on('connection', (socket) => {
   players[socket.id] = {
     x: Math.random() * (WORLD_WIDTH - PLAYER_SIZE),
     y: Math.random() * (WORLD_HEIGHT - PLAYER_SIZE),
-    color: randomColor()
+    color: randomColor(),
+    nick: generateGuestName()
   };
 
   // Send full state and world info to the newly connected client
@@ -55,6 +60,14 @@ io.on('connection', (socket) => {
       players[socket.id].y = clampedY;
       // Broadcast this player's new position to everyone (including sender)
       io.emit('playerMoved', { id: socket.id, player: players[socket.id] });
+    }
+  });
+
+  // Handle custom nickname from client
+  socket.on('setNickname', (nickname) => {
+    if (typeof nickname === 'string' && nickname.trim().length > 0) {
+      players[socket.id].nick = nickname.trim().slice(0, 20); // limit length
+      io.emit('nicknameChanged', { id: socket.id, nick: players[socket.id].nick });
     }
   });
 

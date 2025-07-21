@@ -15,6 +15,12 @@
   <script>
     const socket = io();
 
+    // Ask user for nickname and send to server
+    const nickname = prompt('Enter your nickname') || '';
+    if (nickname.trim().length) {
+      socket.emit('setNickname', nickname.trim());
+    }
+
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
 
@@ -30,6 +36,14 @@
         const p = players[id];
         ctx.fillStyle = p.color || (id === myId ? 'orange' : 'cyan');
         ctx.fillRect(p.x, p.y, playerSize, playerSize);
+        // Draw nickname
+        ctx.font = '12px Arial';
+        ctx.fillStyle = '#fff';
+        ctx.textAlign = 'center';
+        const nickText = p.nick || (id === myId ? 'Me' : '');
+        if (nickText) {
+          ctx.fillText(nickText, p.x + playerSize / 2, p.y - 4);
+        }
       }
       requestAnimationFrame(draw);
     }
@@ -57,6 +71,12 @@
 
     socket.on('playerLeft', (data) => {
       delete players[data.id];
+    });
+
+    socket.on('nicknameChanged', (data) => {
+      if (players[data.id]) {
+        players[data.id].nick = data.nick;
+      }
     });
 
     document.addEventListener('keydown', (e) => {
