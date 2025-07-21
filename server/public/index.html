@@ -18,48 +18,86 @@
     const canvas = document.getElementById('game');
     const ctx = canvas.getContext('2d');
 
-    const state = {};
+    const state = { players: {}, projectiles: [] };
+
+    let lastDir = { dx: 1, dy: 0 };
 
     socket.on('init', ({ id, state: serverState }) => {
-      Object.assign(state, serverState);
+      Object.assign(state.players, serverState.players);
+      state.projectiles = serverState.projectiles;
       socket.id = id;
       draw();
     });
 
     socket.on('state', (serverState) => {
-      Object.assign(state, serverState);
+      state.players = serverState.players;
+      state.projectiles = serverState.projectiles;
       draw();
     });
 
     socket.on('playerJoined', ({ id }) => {
-      state[id] = { x: 0, y: 0 };
+      state.players[id] = { x: 0, y: 0, health: 100, score: 0 };
       draw();
     });
 
     socket.on('playerLeft', ({ id }) => {
-      delete state[id];
+      delete state.players[id];
       draw();
     });
 
     document.addEventListener('keydown', (e) => {
-      const speed = 5;
+      const moveStep = 5;
       let dx = 0, dy = 0;
-      if (e.key === 'ArrowUp') dy = -speed;
-      if (e.key === 'ArrowDown') dy = speed;
-      if (e.key === 'ArrowLeft') dx = -speed;
-      if (e.key === 'ArrowRight') dx = speed;
+      if (e.key === 'ArrowUp') dy = -moveStep;
+      if (e.key === 'ArrowDown') dy = moveStep;
+      if (e.key === 'ArrowLeft') dx = -moveStep;
+      if (e.key === 'ArrowRight') dx = moveStep;
 
-      if (dx || dy) socket.emit('move', { dx, dy });
+      if (dx || dy) {
+        socket.emit('move', { dx, dy });
+        lastDir = { dx, dy };
+      }
+
+      if (e.code === 'Space') {
+        socket.emit('shoot', lastDir);
+      }
     });
 
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      Object.values(state).forEach(({ x, y }) => {
-        ctx.fillStyle = 'white';
+
+      // Draw projectiles
+      state.projectiles.forEach(({ x, y }) => {
+        ctx.fillStyle = 'red';
+        const canvasPos = worldToCanvas(x, y);
         ctx.beginPath();
-        ctx.arc(400 + x, 300 + y, 10, 0, Math.PI * 2);
+        ctx.arc(canvasPos.x, canvasPos.y, 4, 0, Math.PI * 2);
         ctx.fill();
       });
+
+      // Draw players
+      Object.entries(state.players).forEach(([id, p]) => {
+        const { x, y, health, score } = p;
+        const canvasPos = worldToCanvas(x, y);
+        ctx.fillStyle = id === socket.id ? 'cyan' : 'white';
+        ctx.beginPath();
+        ctx.arc(canvasPos.x, canvasPos.y, 12, 0, Math.PI * 2);
+        ctx.fill();
+
+        // health bar
+        ctx.fillStyle = 'green';
+        const barWidth = 24;
+        ctx.fillRect(canvasPos.x - barWidth / 2, canvasPos.y - 20, (health / 100) * barWidth, 4);
+
+        // score text
+        ctx.fillStyle = 'yellow';
+        ctx.font = '10px sans-serif';
+        ctx.fillText(score, canvasPos.x - 3, canvasPos.y + 24);
+      });
+    }
+
+    function worldToCanvas(wx, wy) {
+      return { x: 400 + wx, y: 300 + wy };
     }
   </script>
 </body>

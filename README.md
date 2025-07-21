@@ -34,3 +34,10 @@ From here you can:
 * Replace the simple canvas render with a proper engine like Phaser or PixiJS.
 * Move the client into a separate build step (e.g. Vite + TypeScript/React).
 * Persist game state in a database for long-living worlds.
+
+## New (v0.2)
+
+* Shooting mechanic (`Space`): projectiles can damage other players.
+* Health bar & respawn at 0 HP.
+* Score counter shown under each player.
+* Server tick loop (20 Hz) handles physics and broadcasts authoritative state.
